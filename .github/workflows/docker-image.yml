@@ -11,6 +11,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
+    - name: get latest tag
+      id: vars
+      run: echo ::set-output name=tag::${GITHUB_REF:10}
+
     - name: checkout
       uses: actions/checkout@v3
 
@@ -24,20 +29,28 @@ jobs:
     - name: set up docker buildx
       uses: docker/setup-buildx-action@v1
 
-    - name: docker build
-      run: |
-        docker buildx build \
-          --platform linux/arm64,linux/amd64 \
-          --file Dockerfile \
-          --tag zkalmar/kubectl:latest \
-          --load \
-          .
-
     - name: login to docker hub
       uses: docker/login-action@v1
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
 
-    - name: docker push
-      run: docker image push zkalmar/kubectl:latest
+    # - name: docker build
+    #   run: |
+    #     docker buildx build \
+    #       --platform linux/arm64,linux/amd64 \
+    #       --file Dockerfile \
+    #       --tag zkalmar/kubectl:latest \
+    #       --load \
+    #       .
+
+    - name: build and push
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        platforms: linux/amd64,linux/arm64
+        push: true
+        tags: ${{ secrets.DOCKERHUB_USERNAME }}/kubectl:${{ steps.vars.outputs.tag }},${{ secrets.DOCKERHUB_USERNAME }}/kubectl:latest
+
+    # - name: docker push
+    #   run: docker image push zkalmar/kubectl:latest
