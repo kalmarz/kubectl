@@ -25,7 +25,7 @@ jobs:
     - name: docker build
       run: |
         docker buildx build \
-          --platform linux/arm64 \
+          --platform linux/arm64,linux/amd64 \
           --file Dockerfile \
           --tag zkalmar/kubectl:latest \
           --load \
