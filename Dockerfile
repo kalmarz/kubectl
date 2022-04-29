@@ -16,6 +16,7 @@ RUN ARCH="$(uname -m | sed -e 's/x86_64/amd64/' -e 's/\(arm\)\(64\)\?.*/\1\2/' -
   && rm kubectl \
   && mkdir /.kube && chmod g+rwX /.kube
 
+USER 1001
 
 ENTRYPOINT ["kubectl"]
 CMD ["--help"]
